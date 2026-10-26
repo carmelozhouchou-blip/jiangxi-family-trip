@@ -1201,17 +1201,7 @@
       }, 2600);
     }
 
-    function sharePage() {
-      var url = location.origin + location.pathname;
-      var data = {
-        title: document.title,
-        text: '我们家的江西 5 天 4 晚行程',
-        url: url
-      };
-      if (navigator.share) {
-        navigator.share(data).catch(function () {});
-        return;
-      }
+    function copyUrl(url) {
       if (navigator.clipboard && navigator.clipboard.writeText) {
         navigator.clipboard.writeText(url).then(function () {
           showToast('链接已复制，发给家人吧');
@@ -1221,6 +1211,23 @@
         return;
       }
       window.prompt('复制这个链接分享：', url);
+    }
+
+    function sharePage() {
+      var url = location.origin + location.pathname;
+      var data = {
+        title: document.title,
+        text: '我们家的江西 5 天 4 晚行程',
+        url: url
+      };
+      if (navigator.share) {
+        navigator.share(data).catch(function (error) {
+          if (error && error.name === 'AbortError') return;
+          copyUrl(url);
+        });
+        return;
+      }
+      copyUrl(url);
     }
 
     document.querySelectorAll('[data-share]').forEach(function (button) {
